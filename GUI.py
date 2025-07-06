@@ -45,31 +45,31 @@ class ip():
         except Exception as e:
             return [f"ERROR with DNS: {e}"]
 
-def get_ip_geolocation(self, ip_address):
-    try:
-        response = requests.get(f"https://ipapi.co/{ip_address}/json/")
-        response.raise_for_status()
-        data = response.json()
-        if data.get("error"):
-            return f"Error from geolocation API: {data['reason']}"
+    def get_ip_geolocation(self, ip_address):
+        try:
+            response = requests.get(f"https://ipapi.co/{ip_address}/json/")
+            response.raise_for_status()
+            data = response.json()
+            if data.get("error"):
+                return f"Error from geolocation API: {data['reason']}"
 
-        city = data.get("city", "Unknown")
-        region = data.get("region", "Unknown")
-        country_name = data.get("country_name", "Unknown")
-        latitude = data.get("latitude", "Unknown")
-        longitude = data.get("longitude", "Unknown")
-        org = data.get("org", "Unknown")
+            city = data.get("city", "Unknown")
+            region = data.get("region", "Unknown")
+            country_name = data.get("country_name", "Unknown")
+            latitude = data.get("latitude", "Unknown")
+            longitude = data.get("longitude", "Unknown")
+            org = data.get("org", "Unknown")
 
-        return {
-            "city": city,
-            "region": region,
-            "country_name": country_name,
-            "latitude": latitude,
-            "longitude": longitude,
-            "org": org
-        }
-    except requests.exceptions.RequestException as e:
-        return f"Error with geolocation API: {e}"
+            return {
+                "city": city,
+                "region": region,
+                "country_name": country_name,
+                "latitude": latitude,
+                "longitude": longitude,
+                "org": org
+            }
+        except requests.exceptions.RequestException as e:
+            return f"Error with geolocation API: {e}"
 
 
 class App(ctk.CTk):
@@ -80,11 +80,27 @@ class App(ctk.CTk):
         self.geometry("1000x500")
 
      
-        self.label = ctk.CTkLabel(self, text="Hello, CustomTkinter!")
+        self.label = ctk.CTkLabel(self, text="Hi User\n")
         self.label.pack(pady=20)
 
         self.open_message_button = ctk.CTkButton(self, text = "Open Message Box", command = self.open_message)
         self.open_message_button.pack(pady = 20, padx = 20)
+
+        info_text = f"Local IP: {ip().local_ip}\n" \
+                    f"Public IP: {ip().public_ip}\n" \
+                    f"DNS Names: {', '.join(ip().dns_names)}\n" \
+                    f"Geolocation Info:\n" 
+        
+        self.info_box = ctk.CTkTextbox(self, width=400, height=200)
+        self.info_box.pack(pady=20, padx=20, fill='both', expand=True)
+        self.info_box.insert("0.0", info_text)
+        self.info_box.configure(state="disabled")  # Make the textbox read-only
+
+        self.open_message_button = ctk.CTkButton(self, text="Open Message Box", command=self.open_message)
+        self.open_message_button.pack(pady=20, padx=20)
+
+
+        
 
     def open_message(self):
         mess_box = message_box(self, "WARNING", "this is a message box")
@@ -115,11 +131,9 @@ class message_box(ctk.CTkToplevel):
         self.grab_release()
         self.destroy()
 
-ip_instacne = ip()
-print(f"Local IP: {ip_instacne.local_ip}")
-print(f"Public IP: {ip_instacne.public_ip}")
-print(f"DNS Names: {ip_instacne.dns_names}")
-print(f"Geolocation Info: {ip_instacne.geolocation_info}")
+print("Starting the app...")
+
+
 
 app = App()
 app.mainloop()
