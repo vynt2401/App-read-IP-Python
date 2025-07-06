@@ -1,25 +1,28 @@
-import socket
-import requests
-import dns.resolver
+import socket# libary to connect with TCP/IP, UDP network
+import requests # libary to send HTTP requests
+import dns.resolver # libary to reslove DNS 
 
 
 
-def get_local_ip():
+def get_local_ip(): # lấy địa chỉ ip cục bộ của máy tính đang connect to
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
-        local_ip = s.getstockname()[0]
+        #tạo socket udp và kế t nối đến địa chỉ gg: 8.8.8.8 ở port 80
+
+        local_ip = s.getstockname()[0] # trả về địa chỉ ip cục bộ của máy tính kết nối và lưu ở local ip
         s.close()
         return local_ip
     except Exception as e:
         return f"khong the lay duoc dia chi IP cuc bo: {e}"
     
 
-def get_public_ip():
+def get_public_ip(): # lấy địa chỉ ip public của máy, ip mà internet đang nhìn thấy
     try:
-        response = requests.get("https://api.ipify.org?format=json")
-        response.raise_for_status()
-        return response.json()["ip"]
+        response = requests.get("https://api.ipify.org?format=json") # gửi http requests đến địa chỉ này, sau đó server sẽ trả về một địa chỉ ip công cộng của máy dưới dạng JSON
+        # -> cho thấy được ip mà web server nhìn thấy được từ máy của mình
+        response.raise_for_status() #kiểm tra xem có lỗi gì trong quá trình thực thi kh, nếu có thì raise lỗi
+        return response.json()["ip"] # trả về local ip từ response json
     except requests.exceptions.RequestException as e:
         return f"kh thhe lay duoc ip cong cong: {e}"
     
@@ -42,7 +45,7 @@ def lookup_dns(ip_address):
         return [f"Lỗi khi tra cứu DNS: {e}"]
     
 def get_ip_geolocation(ip_address):
-    """Lấy thông tin địa lý (vùng, quốc gia) của một địa chỉ IP."""
+    """Lấy thông tin địa lý (vùng, quốc gia) của một địa chỉ IP."""                         
     try:
         response = requests.get(f"https://ipapi.co/{ip_address}/json/")
         response.raise_for_status()
